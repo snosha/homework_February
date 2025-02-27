@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "homework-p2"
+version = "0.1.0"
+description = ""
+authors = ["Anton <Antonhasagi@yandex.ru>"]
+readme = "README.md"
+packages = [{include = "homework"}]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.2"
+black = "^25.1.0"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
