@@ -1,5 +1,5 @@
-from models.product import Product
-from models.category import Category
+from src.models.product import Product
+from src.models.category import Category
 
 if __name__ == "__main__":
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)

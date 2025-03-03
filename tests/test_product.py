@@ -1,4 +1,3 @@
-import pytest
 from src.models.product import Product
 
 def test_product_init():
