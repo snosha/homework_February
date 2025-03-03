@@ -1,4 +1,3 @@
-import pytest
 from src.models.category import Category
 from src.models.product import Product
 
