@@ -14,8 +14,19 @@ if __name__ == "__main__":
         [product1, product2, product3]
     )
 
-    # Вывод информации о продуктах в категории
+    # Вывод информации о продуктах
+    print(str(product1))
+    print(str(product2))
+    print(str(product3))
+
+    # Вывод информации о категории
+    print(str(category1))
     print(category1.products)
+
+    # Сложение продуктов
+    print(product1 + product2)
+    print(product1 + product3)
+    print(product2 + product3)
 
     # Добавление нового продукта в категорию
     product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)

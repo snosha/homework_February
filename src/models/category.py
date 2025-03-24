@@ -2,15 +2,12 @@ from src.models.product import Product
 
 
 class Category:
-    product_count = 0  # Статическая переменная для отслеживания количества продуктов
-
     def __init__(self, name: str, description: str, products: list = None):
         self.name = name
         self.description = description
         self.__products = products if products is not None else []
-        for product in self.__products:
-            if isinstance(product, Product):
-                Category.product_count += 1  # Увеличиваем счетчик при добавлении продукта
+        # Преобразуем в нормальную длину
+        self.product_count = len(self.__products)  # Начальное количество продуктов
 
     @property
     def products(self):
@@ -19,9 +16,13 @@ class Category:
     def add_product(self, product: Product):
         if isinstance(product, Product):  # Проверка типа
             self.__products.append(product)
-            Category.product_count += 1  # Увеличиваем количество товаров в категории
+            self.product_count += 1  # Увеличиваем количество товаров в категории
         else:
             raise TypeError("Только объект типа Product может быть добавлен.")
 
     def __repr__(self):
-        return f"Category(name={self.name}, description={self.description}, products={self.products})"
+        return f"{self.name}, количество продуктов: {self.product_count} шт."
+
+    def __str__(self):
+        return f"{self.name}, количество продуктов: {self.product_count} шт."  # Строковое представление категории
+
