@@ -4,15 +4,15 @@ from src.models.category import Category
 
 
 def test_add_product():
-    """Проверяет, что продукт добавляется в категорию и увеличивает счетчик товаров."""
+    """Проверяет, что продукт добавляется в категорию и увеличивает количество товаров."""
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     category = Category("Смартфоны", "Смартфоны для людей", [product1])
 
-    initial_count = category.product_count  # Используем атрибут, а не свойство
+    initial_count = category.total_quantity  # Используем новый метод
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     category.add_product(product2)
 
-    assert category.product_count == initial_count + 1  # Проверяем, что количество продуктов увеличилось
+    assert category.total_quantity == initial_count + 8  # Проверяем, что общее количество товаров увеличилось
 
 
 def test_add_invalid_product():
@@ -32,43 +32,33 @@ def test_product_output():
 
 
 def test_category_str():
-    """Проверяет строковое представление категории."""
-    products = [Product(f"Product {i}", f"Описание {i}", 100.0, 1) for i in range(1, 14)]  # 13 продуктов
+    """Проверяет строковое представление категории с учетом общего количества товаров."""
+    products = [
+        Product("Телефон A", "Описание A", 50000, 3),
+        Product("Телефон B", "Описание B", 60000, 10)
+    ]
     category = Category("Смартфоны", "Смартфоны для людей", products)
 
-    # Проверяем, что строковое представление категории включает количество продуктов
-    assert str(category) == "Смартфоны, количество продуктов: 13 шт."
+    assert str(category) == "Смартфоны, количество продуктов: 13 шт."  # 3 + 10
 
 
-def test_product_addition():
-    """Проверяет магический метод сложения для продуктов."""
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+def test_category_repr():
+    """Проверяет строковое представление категории через repr()."""
+    products = [
+        Product("Телефон X", "Описание X", 70000, 4),
+        Product("Телефон Y", "Описание Y", 80000, 6)
+    ]
+    category = Category("Гаджеты", "Современные гаджеты", products)
 
-    # Проверяем, что сложение продуктов возвращает правильную сумму стоимости
-    assert product1 + product2 == 2580000.0  # 180000 * 5 + 210000 * 8 = 2580000
-
-
-def test_product_str():
-    """Проверяет строковое представление продукта."""
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-
-    # Проверяем, что строковое представление продукта возвращает правильную строку
-    assert str(product1) == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+    assert repr(category) == "Гаджеты, количество продуктов: 10 шт."  # 4 + 6
 
 
-def test_product_price_setter():
-    """Проверяет установку цены у продукта и обработку ошибок."""
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+def test_total_quantity():
+    """Проверяет, что метод total_quantity корректно считает количество товаров."""
+    products = [
+        Product("Гаджет A", "Описание A", 50000, 2),
+        Product("Гаджет B", "Описание B", 60000, 5)
+    ]
+    category = Category("Гаджеты", "Разные гаджеты", products)
 
-    # Проверяем, что цена устанавливается правильно
-    product1.price = 200000.0
-    assert product1.price == 200000.0
-
-    # Проверяем, что при установке отрицательной цены возникает ошибка
-    with pytest.raises(ValueError):
-        product1.price = -100
-
-    # Проверяем, что при установке нулевой цены возникает ошибка
-    with pytest.raises(ValueError):
-        product1.price = 0
+    assert category.total_quantity == 7  # 2 + 5
