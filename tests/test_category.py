@@ -3,62 +3,79 @@ from src.models.product import Product
 from src.models.category import Category
 
 
-def test_add_product():
-    """Проверяет, что продукт добавляется в категорию и увеличивает количество товаров."""
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    category = Category("Смартфоны", "Смартфоны для людей", [product1])
-
-    initial_count = category.total_quantity  # Используем новый метод
-    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    category.add_product(product2)
-
-    assert category.total_quantity == initial_count + 8  # Проверяем, что общее количество товаров увеличилось
+class ProductMock(Product):
+    def __init__(self, name: str, description: str, price: float, quantity: int):
+        super().__init__(name, description, price, quantity)
 
 
-def test_add_invalid_product():
-    """Проверяет, что при попытке добавить не продукт (например, строку), возникает ошибка."""
-    category = Category("Смартфоны", "Смартфоны для людей")
+@pytest.fixture
+def product1():
+    return ProductMock("Product1", "Description1", 100.0, 5)
+
+
+@pytest.fixture
+def product2():
+    return ProductMock("Product2", "Description2", 200.0, 10)
+
+
+@pytest.fixture
+def category_with_products(product1, product2):
+    category = Category("Category1", "Description1", [product1, product2])
+    return category
+
+
+@pytest.fixture
+def empty_category():
+    return Category("EmptyCategory", "Description")
+
+
+def test_add_product(category_with_products, product1):
+    # Проверка добавления продукта
+    new_product = ProductMock("Product3", "Description3", 150.0, 20)
+    category_with_products.add_product(new_product)
+
+    assert len(category_with_products._Category__products) == 3
+    assert category_with_products.total_quantity == 35
+
+
+def test_add_product_invalid_type(category_with_products):
+    # Проверка ошибки при добавлении неправильного типа
     with pytest.raises(TypeError):
-        category.add_product("Not a product")  # Пытаемся добавить строку вместо продукта
+        category_with_products.add_product("Not a Product")
 
 
-def test_product_output():
-    """Проверяет, что метод products правильно возвращает строку с названиями продуктов."""
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    category = Category("Смартфоны", "Смартфоны для людей", [product1, product2])
-
-    assert category.products == "Samsung Galaxy S23 Ultra, Iphone 15"  # Проверяем строковое представление продуктов
+def test_total_quantity(category_with_products):
+    # Проверка правильности вычисления total_quantity
+    assert category_with_products.total_quantity == 15
 
 
-def test_category_str():
-    """Проверяет строковое представление категории с учетом общего количества товаров."""
-    products = [
-        Product("Телефон A", "Описание A", 50000, 3),
-        Product("Телефон B", "Описание B", 60000, 10)
-    ]
-    category = Category("Смартфоны", "Смартфоны для людей", products)
-
-    assert str(category) == "Смартфоны, количество продуктов: 13 шт."  # 3 + 10
+def test_category_representation(category_with_products):
+    # Проверка корректности строкового представления
+    assert str(category_with_products) == "Category1, количество продуктов: 15 шт."
 
 
-def test_category_repr():
-    """Проверяет строковое представление категории через repr()."""
-    products = [
-        Product("Телефон X", "Описание X", 70000, 4),
-        Product("Телефон Y", "Описание Y", 80000, 6)
-    ]
-    category = Category("Гаджеты", "Современные гаджеты", products)
+def test_add_categories(category_with_products, product1, product2):
+    # Проверка операции сложения категорий
+    category2 = Category("Category2", "Description2", [product1, product2])
+    total_quantity = category_with_products + category2
 
-    assert repr(category) == "Гаджеты, количество продуктов: 10 шт."  # 4 + 6
+    assert total_quantity == 30  # 15 + 15
 
 
-def test_total_quantity():
-    """Проверяет, что метод total_quantity корректно считает количество товаров."""
-    products = [
-        Product("Гаджет A", "Описание A", 50000, 2),
-        Product("Гаджет B", "Описание B", 60000, 5)
-    ]
-    category = Category("Гаджеты", "Разные гаджеты", products)
+def test_add_categories_invalid_type(category_with_products, product1):
+    # Проверка ошибки при сложении с некорректным типом
+    with pytest.raises(TypeError):
+        category_with_products + product1
 
-    assert category.total_quantity == 7  # 2 + 5
+
+def test_add_categories_empty_category(category_with_products, empty_category):
+    # Проверка ошибки при сложении пустой категории
+    with pytest.raises(ValueError):
+        category_with_products + empty_category
+
+
+def test_product_property_access(product1):
+    # Проверка доступа к свойствам
+    assert product1.name == "Product1"
+    assert product1.price == 100.0
+    assert product1.quantity == 5

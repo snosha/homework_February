@@ -6,14 +6,19 @@ class Product:
         self.quantity = quantity
 
     def __str__(self):
-        # Строковое представление товара
         return f"{self.name}, {self._price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
-        # Магический метод сложения
+        # Проверка на одинаковые классы
         if not isinstance(other, Product):
-            raise TypeError("Складывать можно только объекты класса Product")
+            raise TypeError("Складывать можно только объекты одного класса")
+
+        # Проверка на совпадение классов для смартфонов и травы газонной
+        if type(self) != type(other):
+            raise TypeError("Невозможно сложить объекты разных классов (например, Smartphone и LawnGrass).")
+
         return self._price * self.quantity + other._price * other.quantity
+
 
     @property
     def price(self):
@@ -21,18 +26,17 @@ class Product:
 
     @price.setter
     def price(self, value):
-        # Установим цену, проверяя, что она положительная
         if value <= 0:
             raise ValueError("Цена должна быть положительным числом")
         self._price = value
 
     @classmethod
     def new_product(cls, data: dict):
-        # Класс-метод для создания нового продукта из словаря
+        if not all(key in data for key in ["name", "description", "price", "quantity"]):
+            raise ValueError("В данных должны быть ключи: 'name', 'description', 'price', 'quantity'.")
         return cls(
             data["name"],
             data["description"],
             data["price"],
             data["quantity"]
         )
-

@@ -1,61 +1,76 @@
 import pytest
 from src.models.product import Product
 
+# Тестирование класса Product
 
-def test_product_creation():
-    """Проверяет создание продукта с корректными параметрами."""
-    product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-
-    assert product.name == "Samsung Galaxy S23 Ultra"
-    assert product.description == "256GB, Серый цвет, 200MP камера"
-    assert product.price == 180000.0
-    assert product.quantity == 5
+@pytest.fixture
+def product():
+    return Product("Product1", "Description1", 100.0, 10)
 
 
-def test_product_price_setter():
-    """Проверяет, что цена продукта может быть изменена через setter."""
-    product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+def test_product_initialization(product):
+    # Проверка инициализации объекта Product
+    assert product.name == "Product1"
+    assert product.description == "Description1"
+    assert product.price == 100.0
+    assert product.quantity == 10
 
-    product.price = 200000.0
-    assert product.price == 200000.0
+
+def test_product_str(product):
+    # Проверка строкового представления
+    assert str(product) == "Product1, 100.0 руб. Остаток: 10 шт."
 
 
-def test_product_price_setter_invalid():
-    """Проверяет, что установка отрицательной или нулевой цены вызывает ошибку."""
-    product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+def test_product_addition_same_class(product):
+    # Проверка правильности сложения объектов одного класса
+    other_product = Product("Product2", "Description2", 200.0, 5)
+    result = product + other_product
+    assert result == 2000.0  # 100.0 * 10 + 200.0 * 5
 
+
+def test_product_addition_different_class(product):
+    # Проверка ошибки при сложении объектов разных классов
+    with pytest.raises(TypeError):
+        product + "Not a Product"
+
+
+def test_product_price_setter(product):
+    # Проверка правильности сеттера для цены
+    product.price = 150.0
+    assert product.price == 150.0
+
+    # Проверка ошибки при установке отрицательной цены
     with pytest.raises(ValueError):
-        product.price = -1000.0  # Попытка установить отрицательную цену
-
-    with pytest.raises(ValueError):
-        product.price = 0.0  # Попытка установить цену 0
+        product.price = -50.0
 
 
-def test_product_str():
-    """Проверяет строковое представление продукта."""
-    product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    assert str(product) == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
-
-
-def test_product_addition():
-    """Проверяет работу оператора сложения продуктов (складывает стоимость всех продуктов)."""
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-
-    assert product1 + product2 == 180000.0 * 5 + 210000.0 * 8  # Стоимость двух продуктов
-
-
-def test_new_product():
-    """Проверяет создание нового продукта через класс-метод new_product."""
+def test_product_new_product_valid_data():
+    # Проверка корректного создания нового продукта из словаря
     data = {
-        "name": "Samsung Galaxy S23 Ultra",
-        "description": "256GB, Серый цвет, 200MP камера",
-        "price": 180000.0,
-        "quantity": 5
+        "name": "Product3",
+        "description": "Description3",
+        "price": 300.0,
+        "quantity": 20
     }
-    product = Product.new_product(data)
+    new_product = Product.new_product(data)
+    assert isinstance(new_product, Product)
+    assert new_product.name == "Product3"
+    assert new_product.description == "Description3"
+    assert new_product.price == 300.0
+    assert new_product.quantity == 20
 
-    assert product.name == "Samsung Galaxy S23 Ultra"
-    assert product.description == "256GB, Серый цвет, 200MP камера"
-    assert product.price == 180000.0
-    assert product.quantity == 5
+
+def test_product_new_product_invalid_data():
+    # Проверка ошибки, если в словаре нет обязательных ключей
+    data = {
+        "name": "Product4",
+        "description": "Description4",
+        "price": 400.0
+    }
+    with pytest.raises(ValueError):
+        Product.new_product(data)
+
+
+def test_product_price_getter(product):
+    # Проверка геттера для цены
+    assert product.price == 100.0
