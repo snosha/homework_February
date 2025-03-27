@@ -1,0 +1,15 @@
+from src.models.product import Product
+
+
+class LawnGrass(Product):
+    def __init__(self, name: str, description: str, price: float, quantity: int, country: str, germination_period: int, color: str):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+    def __str__(self):
+        return (f"Трава {self.name}, страна-производитель: {self.country}, "
+                f"срок прорастания: {self.germination_period} дней, "
+                f"цвет: {self.color}, {self.price} руб. Остаток: {self.quantity} шт.")
+
