@@ -1,5 +1,6 @@
 import pytest
 from src.models.product import Product
+import sys
 
 # Тестирование класса Product
 
@@ -74,3 +75,24 @@ def test_product_new_product_invalid_data():
 def test_product_price_getter(product):
     # Проверка геттера для цены
     assert product.price == 100.0
+
+
+def test_repr_product(product):
+    # Проверка строкового представления через __repr__
+    repr_str = repr(product)
+    assert "Product" in repr_str
+    assert "name=Product1" in repr_str
+    assert "price=100.0" in repr_str
+
+
+def test_mixin_print_output(capfd):
+    # Проверка вывода через print в Mixin
+    # Создаем объект внутри теста, чтобы захватить вывод
+    product2 = Product("Product2", "Description2", 200.0, 5)
+
+    # Перехватываем вывод из stdout и stderr
+    captured = capfd.readouterr()
+
+    # Проверяем, что вывод содержит информацию о созданном объекте
+    assert "Создан объект Product с параметрами" in captured.out or "Создан объект Product с параметрами" in captured.err
+    assert "('Product2', 'Description2', 200.0, 5)" in captured.out or "('Product2', 'Description2', 200.0, 5)" in captured.err
