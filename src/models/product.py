@@ -4,6 +4,9 @@ from src.models.mixin import Mixin
 
 class Product(BaseProduct, Mixin):  # Добавляем mixin
     def __init__(self, name: str, description: str, price: float, quantity: int):
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+
         super().__init__(name, description, price, quantity)  # Вызов конструктора родительского класса
 
         # Добавляем вывод, который будет перехвачен в тестах

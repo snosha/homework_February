@@ -20,8 +20,7 @@ def product2():
 
 @pytest.fixture
 def category_with_products(product1, product2):
-    category = Category("Category1", "Description1", [product1, product2])
-    return category
+    return Category("Category1", "Description1", [product1, product2])
 
 
 @pytest.fixture
@@ -30,7 +29,6 @@ def empty_category():
 
 
 def test_add_product(category_with_products, product1):
-    # Проверка добавления продукта
     new_product = ProductMock("Product3", "Description3", 150.0, 20)
     category_with_products.add_product(new_product)
 
@@ -39,43 +37,51 @@ def test_add_product(category_with_products, product1):
 
 
 def test_add_product_invalid_type(category_with_products):
-    # Проверка ошибки при добавлении неправильного типа
     with pytest.raises(TypeError):
         category_with_products.add_product("Not a Product")
 
 
 def test_total_quantity(category_with_products):
-    # Проверка правильности вычисления total_quantity
     assert category_with_products.total_quantity == 15
 
 
 def test_category_representation(category_with_products):
-    # Проверка корректности строкового представления
     assert str(category_with_products) == "Category1, количество продуктов: 15 шт."
 
 
 def test_add_categories(category_with_products, product1, product2):
-    # Проверка операции сложения категорий
     category2 = Category("Category2", "Description2", [product1, product2])
     total_quantity = category_with_products + category2
-
     assert total_quantity == 30  # 15 + 15
 
 
 def test_add_categories_invalid_type(category_with_products, product1):
-    # Проверка ошибки при сложении с некорректным типом
     with pytest.raises(TypeError):
         category_with_products + product1
 
 
 def test_add_categories_empty_category(category_with_products, empty_category):
-    # Проверка ошибки при сложении пустой категории
     with pytest.raises(ValueError):
         category_with_products + empty_category
 
 
 def test_product_property_access(product1):
-    # Проверка доступа к свойствам
     assert product1.name == "Product1"
     assert product1.price == 100.0
     assert product1.quantity == 5
+
+
+# ✅ Новый тест: исключение при нулевом количестве товара
+def test_product_zero_quantity_raises_value_error():
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Broken", "Zero quantity", 999.0, 0)
+
+
+# ✅ Новый тест: средняя цена товаров в категории
+def test_middle_price_with_products(category_with_products):
+    assert category_with_products.middle_price() == 150.0  # (100 + 200) / 2
+
+
+# ✅ Новый тест: средняя цена в пустой категории
+def test_middle_price_empty_category(empty_category):
+    assert empty_category.middle_price() == 0

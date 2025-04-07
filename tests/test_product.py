@@ -96,3 +96,9 @@ def test_mixin_print_output(capfd):
     # Проверяем, что вывод содержит информацию о созданном объекте
     assert "Создан объект Product с параметрами" in captured.out or "Создан объект Product с параметрами" in captured.err
     assert "('Product2', 'Description2', 200.0, 5)" in captured.out or "('Product2', 'Description2', 200.0, 5)" in captured.err
+
+
+def test_product_zero_quantity_raises_value_error():
+    # Проверка, что при нулевом количестве создается исключение ValueError
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("InvalidProduct", "Zero quantity", 999.0, 0)

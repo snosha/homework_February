@@ -18,12 +18,11 @@ class Category:
 
         self.__products.append(product)
 
-
     def __repr__(self):
         return f"{self.name}, количество продуктов: {self.total_quantity} шт."
 
     def __str__(self):
-        total_quantity = sum(product.quantity for product in self.__products)  # Исправлено __products
+        total_quantity = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 
     @property
@@ -49,3 +48,10 @@ class Category:
             product.quantity for product in other.__products)
         return total_quantity
 
+    def middle_price(self) -> float:
+        """Подсчет средней цены товаров в категории."""
+        try:
+            total_price = sum(product.price for product in self.__products)
+            return total_price / len(self.__products)
+        except ZeroDivisionError:
+            return 0
