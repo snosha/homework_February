@@ -1,22 +1,87 @@
-from src.models.category import Category
+import pytest
 from src.models.product import Product
+from src.models.category import Category
 
-def test_category_init():
-    product1 = Product("Test Product 1", "Description", 100.0, 10)
-    product2 = Product("Test Product 2", "Description", 200.0, 5)
-    category = Category("Test Category", "Test Description", [product1, product2])
 
-    assert category.name == "Test Category"
-    assert category.description == "Test Description"
-    assert len(category.products) == 2
+class ProductMock(Product):
+    def __init__(self, name: str, description: str, price: float, quantity: int):
+        super().__init__(name, description, price, quantity)
 
-def test_category_counts():
-    Category.category_count = 0
-    Category.product_count = 0
 
-    product1 = Product("Test Product 1", "Description", 100.0, 10)
-    product2 = Product("Test Product 2", "Description", 200.0, 5)
-    category = Category("Test Category", "Test Description", [product1, product2])
+@pytest.fixture
+def product1():
+    return ProductMock("Product1", "Description1", 100.0, 5)
 
-    assert Category.category_count == 1
-    assert Category.product_count == 2
+
+@pytest.fixture
+def product2():
+    return ProductMock("Product2", "Description2", 200.0, 10)
+
+
+@pytest.fixture
+def category_with_products(product1, product2):
+    return Category("Category1", "Description1", [product1, product2])
+
+
+@pytest.fixture
+def empty_category():
+    return Category("EmptyCategory", "Description")
+
+
+def test_add_product(category_with_products, product1):
+    new_product = ProductMock("Product3", "Description3", 150.0, 20)
+    category_with_products.add_product(new_product)
+
+    assert len(category_with_products._Category__products) == 3
+    assert category_with_products.total_quantity == 35
+
+
+def test_add_product_invalid_type(category_with_products):
+    with pytest.raises(TypeError):
+        category_with_products.add_product("Not a Product")
+
+
+def test_total_quantity(category_with_products):
+    assert category_with_products.total_quantity == 15
+
+
+def test_category_representation(category_with_products):
+    assert str(category_with_products) == "Category1, количество продуктов: 15 шт."
+
+
+def test_add_categories(category_with_products, product1, product2):
+    category2 = Category("Category2", "Description2", [product1, product2])
+    total_quantity = category_with_products + category2
+    assert total_quantity == 30  # 15 + 15
+
+
+def test_add_categories_invalid_type(category_with_products, product1):
+    with pytest.raises(TypeError):
+        category_with_products + product1
+
+
+def test_add_categories_empty_category(category_with_products, empty_category):
+    with pytest.raises(ValueError):
+        category_with_products + empty_category
+
+
+def test_product_property_access(product1):
+    assert product1.name == "Product1"
+    assert product1.price == 100.0
+    assert product1.quantity == 5
+
+
+# ✅ Новый тест: исключение при нулевом количестве товара
+def test_product_zero_quantity_raises_value_error():
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Broken", "Zero quantity", 999.0, 0)
+
+
+# ✅ Новый тест: средняя цена товаров в категории
+def test_middle_price_with_products(category_with_products):
+    assert category_with_products.middle_price() == 150.0  # (100 + 200) / 2
+
+
+# ✅ Новый тест: средняя цена в пустой категории
+def test_middle_price_empty_category(empty_category):
+    assert empty_category.middle_price() == 0
